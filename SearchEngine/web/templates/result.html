@@ -1,0 +1,209 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>tang's Search Engine</title>
+    <link href="../static/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="../static/css/result.css" rel="stylesheet" type="text/css"/>
+    {#    <link href="../static/css/bootstrap.css" rel="stylesheet" type="text/css"/>#}
+    {#    <link href="../static/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>#}
+
+</head>
+<body>
+<div id="container">
+    <!-- 上方logo和搜索栏 -->
+    <div id="hd" class="ue-clear">
+        <a href="/index">
+            <div class="logo"></div>
+        </a>
+        <div class="inputArea">
+            <form method="post" action="/results" enctype="multipart/form-data">
+                <input type="text" name="query" class="searchInput" value="{{ query }}"/>
+                <button class="searchButton" type="submit"></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 内容区域 -->
+    <div id="bd" class="ue-clear">
+        <div id="main">
+            <div class="sideBar">
+                <!-- 用的别人模板，我没有这一块内容 -->
+                <div class="subfield">内容调整</div>
+                <ul class="subfieldContext">
+                    <li>
+                        <a href="/results?q={{ query }}&page=1&label=news"
+                           class="byDependence">更感兴趣娱乐</a>
+                    </li>
+                    <li>
+                        <a href="/results?q={{ query }}&page=1&label=news"
+                           class="byDependence">更感兴趣时政</a>
+                    </li>
+                    <li>
+                        <a href="/results?q={{ query }}&page=1&label=douban"
+                           class="byTime">更感兴趣书籍</a>
+
+                    </li>
+                    <li>
+                        <a href="/results?q={{ query }}&page=1&label=douban"
+                           class="byTime">更感兴趣电影</a>
+
+                    </li>
+                    <li>
+                        <a href="/results?q={{ query }}&page=1&label=page"
+                           class="byDependentang's Search Enginece">更感兴趣技术</a>
+                    </li>
+                </ul>
+
+                <div class="subfield">相关链接</div>
+                <ul class="subfieldContext">
+                    <li>
+                        <span class="name">
+                            <a target="_blank" href="https://github.com/easymoneysnipertang">
+                            &nbsp;StudentTang
+                            </a>
+                        </span>
+                    </li>
+                    <li>
+                        <span class="name">
+                            <a target="_blank" href="https://cc.nankai.edu.cn">
+                                &nbsp;NKUCS
+                            </a>
+                        </span>
+                    </li>
+                    <li>
+                        <span class="name">
+                            <a target="_blank" href="/index">
+                                &nbsp;tang's SearchEngine
+                            </a></span>
+                    </li>
+                </ul>
+
+                <div class="sideBarShowHide">
+                    <a href="javascript:;" class="icon"></a>
+                </div>
+            </div>
+
+            <div class="resultArea">
+                <p class="resultTotal">
+                    <span class="info">找到约&nbsp;<span class="totalResult">{{ number }}</span>
+                        &nbsp;条结果(用时约<span class="time">{{ cost_time }}</span>秒)，共<span
+                                class="totalPage">{{ last_page }}</span>页</span>
+                </p>
+
+                <div class="resultList" id="resultList">
+                    {% if number == 0 %}
+                        <p>抱歉！没有找到结果。</p>
+                        <p>请跳转<a target="_blank" href="https://www.bing.com/">bing</a>进行搜索。</p>
+                    {% endif %}
+
+                    {% for result in results %}
+                        <div class="resultItem">
+                            <div class="itemHead">
+                                <a href="{{ result.url }}" target="_blank" class="title">
+                                    {{ result.title }}
+                                </a>
+                                <span class="divsion"></span>
+
+                                <span class="dependValue">
+                                <span class="label">得分：</span>
+                                <span class="value">{{ result.score }}</span>
+                            </span>
+                            </div>
+                            <div class="itemBody">
+                                {{ result.content|truncate(150, True, '...') }}
+                                <a href="{{ result.url }} " target="_blank">
+                                    <span class="text">更多</span>
+                                    <i class="moreIcon"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                 <!-- 分页 -->
+                 <div class="pagination ue-clear">
+                    <a href="?page={{ page - 1 if page > 1 else 1 }}">上一页</a>
+                    <span>当前页：{{ page }}</span>
+                    <a href="?page={{ page + 1 if page < last_page else last_page }}">下一页</a>
+                </div>
+
+                <!-- 相关搜索 -->
+                <div class="dependSearch ue-clear">
+                    {% if has_recommend == 1 %}
+                        <h6>相关搜索</h6>
+                        <div class="searchList">
+                            <p>
+                                {% for q in recommend_query1 %}
+                                    <a href="/results?q={{ q }}"> {{ q }} </a>
+                                {% endfor %}
+                            </p>
+                            <p>
+                                {% for q in recommend_query2 %}
+                                    <a href="/results?q={{ q }}"> {{ q }} </a>
+                                {% endfor %}
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div> <!-- End of resultArea -->
+
+            <!--历史热门搜索-->
+            <div class="historyArea">
+                <div class="hotSearch">
+                    <h6>热门搜索</h6>
+                    <ul class="historyList">
+                        {% for query in pop_query %}
+                            <li>&nbsp;&nbsp;
+                                <a href="/results?q={{ query }}"> {{ query }} </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+        </div><!-- End of main -->
+    </div><!--End of bd-->
+</div>
+
+<div id="foot">Copyright: 
+    <a href="https://github.com/easymoneysnipertang/InformationRetrieval">StudentTang</a>
+</div>
+
+
+<script src="/static/js/jquery-1.10.2.min.js"></script>
+<script src="/static/js/textSearch.js"></script>
+
+<script>
+    window.onload = function() {
+        var links = document.querySelectorAll('.title');
+        links.forEach(function(link) {
+            link.addEventListener('click', function(event) { // 在这里添加 event 参数
+                event.preventDefault(); // 阻止默认的链接点击行为
+                // 跳转
+                window.open(this.href);
+                //console.log('用户点击了URL: ' + this.href);
+                // 使用 AJAX 将 URL 传递到后端
+                $.ajax({
+                    url: '/results/handle_click', // 你的 Flask 路由
+                    method: 'POST',
+                    data: {
+                        'url': this.href
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        // 在这里处理服务器的响应
+                    }
+                });
+            });
+        });
+    };
+</script>
+
+<script type="text/javascript">
+    $(".resultList").textSearch("{{ highlight }}")
+</script>
+</body>
+
+</html>
